@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeService;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -90,5 +92,62 @@ public class EmployeeController {
        employeeService.save(employee);
 
        return R.success("新增员工成功！");
+   }
+
+
+    /**
+     * 员工信息的分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+   @GetMapping("/page")
+   public R<Page> page(int page, int pageSize, String name) {
+       log.info("page = {}, pageSize={}, name={}", page, pageSize, name);
+
+//       构造分页构造器
+       Page pageInfo = new Page(page, pageSize);
+//       条件构造器
+       LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+       if(name !=null){
+           queryWrapper.like(Employee::getName, name);
+       }
+//       queryWrapper.like(StringUtils.isEmpty(name), Employee::getUsername, name);
+
+       queryWrapper.orderByDesc(Employee::getUpdateTime);
+
+       employeeService.page(pageInfo, queryWrapper);
+//       执行查询
+       return R.success(pageInfo);
+   }
+
+    /**
+     * 根据id 修改员工信息
+     * @param request
+     * @param employee
+     * @return
+     */
+   @PutMapping
+   public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+       Long empId = (Long) request.getSession().getAttribute("employee");
+       employee.setUpdateTime(LocalDateTime.now());
+       employee.setUpdateUser(empId);
+       employeeService.updateById(employee);
+       return R.success("员工信息修改成功");
+   }
+
+    /**
+     * 根据id 获取员工信息
+     * @param id
+     * @return
+     */
+   @GetMapping("/{id}")
+   public R<Employee> getById(@PathVariable Long id) {
+       Employee employee = employeeService.getById(id);
+       if(employee != null) {
+           return R.success(employee);
+       }
+       return R.error("没有查询到对应信息");
    }
 }
