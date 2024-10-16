@@ -1,6 +1,7 @@
 package com.itheima.reggie.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
@@ -13,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,5 +99,34 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             return item;
         }).collect(Collectors.toList());
         dishFlavorService.saveBatch(flavors);
+    }
+
+    /**
+     * 根据id 删除菜品
+     * @param ids
+     */
+    @Override
+    public void remove(String ids) {
+        String[] split=ids.split(",");
+        for (String id:split) {
+            this.removeById(Long.parseLong(id));
+            dishFlavorService.remove(new LambdaQueryWrapper<DishFlavor>().eq(DishFlavor::getDishId, id));
+        }
+    }
+
+    /**
+     * 更新菜单状态
+     * @param ids
+     * @param status 0 停售 1 起售
+     */
+    @Override
+    public void updateStatus(String ids,@PathVariable Integer status) {
+        String[] idList = ids.split(",");
+        for (String id : idList) {
+            Dish dish = new Dish();
+            dish.setId(Long.parseLong(id));
+            dish.setStatus(status);
+            this.updateById(dish);
+        }
     }
 }
