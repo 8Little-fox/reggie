@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -130,5 +129,24 @@ public class DishController {
     public R<String> updateStatus(String ids, @PathVariable Integer status) {
         dishService.updateStatus(ids, status);
         return R.success("操作成功");
+    }
+
+    /**
+     * 根据条件查询对应的菜品数据
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+//        根据分类categoryId  查询
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+//        查询状态为1 的。1为起售状态
+        queryWrapper.eq(Dish::getStatus, 1);
+        List<Dish> list = dishService.list(queryWrapper);
+
+        return R.success(list);
     }
 }
