@@ -18,43 +18,40 @@ import java.util.Date;
 
 /**
  * <p>
- * 套餐
+ * 套餐菜品关系
  * </p>
  *
  * @author anyi
- * @since 2022-05-24
+ * @since 2022-05-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="Setmeal对象", description="套餐")
-public class Setmeal implements Serializable {
+@ApiModel(value="SetmealDish对象", description="套餐菜品关系")
+public class SetmealDish implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "主键")
     private Long id;
 
-    @ApiModelProperty(value = "菜品分类id")
-    private Long categoryId;
+    @ApiModelProperty(value = "套餐id ")
+    private String setmealId;
 
-    @ApiModelProperty(value = "套餐名称")
+    @ApiModelProperty(value = "菜品id")
+    private String dishId;
+
+    @ApiModelProperty(value = "菜品名称 （冗余字段）")
     private String name;
 
-    @ApiModelProperty(value = "套餐价格")
+    @ApiModelProperty(value = "菜品原价（冗余字段）")
     private BigDecimal price;
 
-    @ApiModelProperty(value = "状态 0:停用 1:启用")
-    private Integer status;
+    @ApiModelProperty(value = "份数")
+    private Integer copies;
 
-    @ApiModelProperty(value = "编码")
-    private String code;
-
-    @ApiModelProperty(value = "描述信息")
-    private String description;
-
-    @ApiModelProperty(value = "图片")
-    private String image;
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
 
     @ApiModelProperty(value = "是否删除")
     private Integer isDeleted;
