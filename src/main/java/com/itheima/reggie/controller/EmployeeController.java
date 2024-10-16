@@ -80,13 +80,15 @@ public class EmployeeController {
        log.info("新增员工，员工信息： {}", employee.toString());
 //       设置初始密码，
        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-       employee.setCreateTime(LocalDateTime.now());
-       employee.setUpdateTime(LocalDateTime.now());
+
+//       //公共自动自动填充 common/MyMetaObjectHandler.java
+//       employee.setCreateTime(LocalDateTime.now());
+//       employee.setUpdateTime(LocalDateTime.now());
 
 //       获取当前登录用户的id
-       Long empId = (Long) request.getSession().getAttribute("employee");
-       employee.setCreateUser(empId);
-       employee.setUpdateUser(empId);
+//       Long empId = (Long) request.getSession().getAttribute("employee");
+//       employee.setCreateUser(empId);
+//       employee.setUpdateUser(empId);
 
 
        employeeService.save(employee);
@@ -97,6 +99,11 @@ public class EmployeeController {
 
     /**
      * 员工信息的分页查询
+     * 1: 页面发送 ajax请求，将分页查询参数 （page、pageSize）提交到服务端
+     * 2: 服务端 Controller 接受页面提交的数据并调用 Service 查询数据
+     * 3: Service 调用 Mapper 操作数据库，查询分页数据
+     * 4: Controller 将查询到的分页数据响应给页面
+     * 5: 页面接收到分页数据并通过ElementUI的 Table 组件展示到页面上
      * @param page
      * @param pageSize
      * @param name
@@ -104,8 +111,6 @@ public class EmployeeController {
      */
    @GetMapping("/page")
    public R<Page> page(int page, int pageSize, String name) {
-       log.info("page = {}, pageSize={}, name={}", page, pageSize, name);
-
 //       构造分页构造器
        Page pageInfo = new Page(page, pageSize);
 //       条件构造器
@@ -118,7 +123,6 @@ public class EmployeeController {
        queryWrapper.orderByDesc(Employee::getUpdateTime);
 
        employeeService.page(pageInfo, queryWrapper);
-//       执行查询
        return R.success(pageInfo);
    }
 
@@ -130,9 +134,14 @@ public class EmployeeController {
      */
    @PutMapping
    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
-       Long empId = (Long) request.getSession().getAttribute("employee");
-       employee.setUpdateTime(LocalDateTime.now());
-       employee.setUpdateUser(empId);
+//       //公共自动自动填充 common/MyMetaObjectHandler.java
+//       Long empId = (Long) request.getSession().getAttribute("employee");
+//       employee.setUpdateTime(LocalDateTime.now());
+//       employee.setUpdateUser(empId);
+
+       long id = Thread.currentThread().getId();
+       log.info("线程id 为：{}", id);
+
        employeeService.updateById(employee);
        return R.success("员工信息修改成功");
    }
