@@ -105,7 +105,7 @@ public class DishController {
 
         dishService.updateWithFlavor(dishDto);
 
-        return R.success("新增菜品成功");
+        return R.success("修改菜品成功");
     }
 
     /**
@@ -114,9 +114,9 @@ public class DishController {
      * @return
      */
     @DeleteMapping
-    public R<String> delete(String ids) {
-        dishService.remove(ids);
-        return R.success("菜品删除成功");
+    public R<String> delete(@RequestParam List<Long> ids) {
+        dishService.removeWithFlavor(ids);
+        return R.success("删除菜品成功");
     }
 
     /**

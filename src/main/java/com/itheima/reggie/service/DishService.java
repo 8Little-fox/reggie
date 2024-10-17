@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
 
+import java.util.List;
+
 
 public interface DishService extends IService<Dish> {
 
@@ -17,7 +19,7 @@ public interface DishService extends IService<Dish> {
     public void  updateWithFlavor(DishDto dishDto);
 
 //    根据ids 批量删除菜品
-    public void remove(String ids);
+    public void removeWithFlavor(List<Long> ids);
 //    更新菜单状态
     public void updateStatus(String ids, Integer status);
 }

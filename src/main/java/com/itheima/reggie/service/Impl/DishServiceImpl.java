@@ -3,9 +3,11 @@ package com.itheima.reggie.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.DishFlavor;
+import com.itheima.reggie.entity.Setmeal;
 import com.itheima.reggie.mapper.DishMapper;
 import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
@@ -106,12 +108,21 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @param ids
      */
     @Override
-    public void remove(String ids) {
-        String[] split=ids.split(",");
-        for (String id:split) {
-            this.removeById(Long.parseLong(id));
-            dishFlavorService.remove(new LambdaQueryWrapper<DishFlavor>().eq(DishFlavor::getDishId, id));
+    @Transactional
+    public void removeWithFlavor(List<Long> ids) {
+//        查询菜品状态，确定是否删除
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Dish::getId, ids);
+        queryWrapper.eq(Dish::getStatus, 1);
+
+        int count = this.count(queryWrapper);
+
+//        如果不能删除，抛出一个业务异常
+        if(count>0){
+            throw new CustomException("菜品正在售卖中，不能删除");
         }
+//        如果可以删除，先删除套餐表中的数据
+        this.removeByIds(ids);
     }
 
     /**

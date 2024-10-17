@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 新增套餐管理
+ */
 @Data
 public class SetmealDto extends Setmeal {
     private List<SetmealDish> setmealDishes;
